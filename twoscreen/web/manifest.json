@@ -1,11 +1,11 @@
 {
-    "name": "ramos_unit5_excercise",
-    "short_name": "ramos_unit5_excercise",
+    "name": "Renz's Profile",
+    "short_name": "Renz's Profile",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Renz Ramos profile app.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -341,6 +341,7 @@ class _ResultTile extends StatelessWidget {
                 child: Image.network(
                   imageUrl!,
                   fit: BoxFit.cover,
+                  webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
                   errorBuilder: (_, __, ___) => Icon(fallbackIcon, size: 32),
                 ),
               ),
@@ -717,6 +718,8 @@ class _PickDetailScreenState extends State<PickDetailScreen> {
                                 child: Image.network(
                                   d.imageUrl!,
                                   fit: BoxFit.contain,
+                                  webHtmlElementStrategy:
+                                      WebHtmlElementStrategy.fallback,
                                   errorBuilder: (_, __, ___) =>
                                       const Icon(Icons.broken_image, size: 96),
                                 ),
