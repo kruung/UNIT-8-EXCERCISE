@@ -1,0 +1,71 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Install dependencies
+        working-directory: twoscreen
+        run: flutter pub get
+
+      - name: Run tests
+        working-directory: twoscreen
+        run: flutter test
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build web for GitHub Pages
+        working-directory: twoscreen
+        env:
+          OMDB_KEY: ${{ secrets.OMDB_KEY }}
+          CMS_SPACE: ${{ vars.CMS_SPACE }}
+          CMS_TOKEN: ${{ secrets.CMS_TOKEN }}
+        run: |
+          if [[ -z "$OMDB_KEY" || -z "$CMS_SPACE" || -z "$CMS_TOKEN" ]]; then
+            echo "::error::Set OMDB_KEY and CMS_TOKEN as repository secrets, and CMS_SPACE as a repository variable."
+            exit 1
+          fi
+          flutter build web --release \
+            --base-href "/${{ github.event.repository.name }}/" \
+            --dart-define=OMDB_KEY="$OMDB_KEY" \
+            --dart-define=CMS_SPACE="$CMS_SPACE" \
+            --dart-define=CMS_TOKEN="$CMS_TOKEN"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: twoscreen/build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
